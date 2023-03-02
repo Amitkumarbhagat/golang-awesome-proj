@@ -8,8 +8,8 @@ import (
 
 const portNumber = ":8080"
 
-func Home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "This is the home")
+func Home(writer http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(writer, "This is the home")
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
