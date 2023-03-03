@@ -1,50 +1,36 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 )
 
 const portNumber = ":8080"
 
-func Home(writer http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(writer, "This is the home")
+func Home(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, "home.page.tmpl")
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
-	sum := addValues(2, 3)
-	_, _ = fmt.Fprintf(w, fmt.Sprintf("This is the home page 2 + 3 is %d", sum))
+	renderTemplate(w, "about.page.tmpl")
 }
 
-func addValues(x, y int) int {
-	return x + y
-}
+func renderTemplate(w http.ResponseWriter, tmpl string) {
+	parsedTemplate, _ := template.ParseFiles("./templates/" + tmpl)
 
-func Divide(w http.ResponseWriter, r *http.Request) {
-	f, err := divideValues(0, 0)
+	err := parsedTemplate.Execute(w, nil)
 	if err != nil {
-		fmt.Fprintf(w, "Cannot divivde by 0")
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		fmt.Println("error parsing template:", err)
 		return
 	}
-
-	fmt.Fprintf(w, fmt.Sprintf("%f divide by %f is %f", 100.0, 10.0, f))
-}
-
-func divideValues(x float32, y float32) (float32, error) {
-	if y <= 0 {
-		err := errors.New("cannot divide by zero")
-		return 0, err
-	}
-	result := x / y
-	return result, nil
 }
 
 func main() {
 
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/About", About)
-	http.HandleFunc("/Divide", Divide)
 
 	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
 	_ = http.ListenAndServe(portNumber, nil)
